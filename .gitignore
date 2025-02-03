@@ -2,3 +2,6 @@
 .vagrant/
 node_modules/
 temp/
+
+dist/
+.env
