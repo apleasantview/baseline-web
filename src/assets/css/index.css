@@ -1,5 +1,19 @@
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
+/* 01. Settings */
+
+/* 02. Tools */
+
+/* 03. Generic */
+@import "./generic/modern-reset.css" layer(reset);
+
+/* 04. Elements */
+
+/* 05. Objects */
+
+/* 06. Components */
+
+/* 07. Utilities */
+
+/* CSS is organised followng ITCSS and BEMIT naming conventions, see:
+@link: https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/
+@link: https://benmarshall.me/itcss/
+*/

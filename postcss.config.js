@@ -1,3 +1,4 @@
+import postcssImportExtGlob from "postcss-import-ext-glob";
 import postcssImport from "postcss-import";
 import postcssPresetEnv from "postcss-preset-env";
 import cssnano from "cssnano"; // Import cssnano for minification
@@ -10,7 +11,12 @@ if (isProd) {
 }
 
 const config = {
-	plugins: [postcssImport, postcssPresetEnv, ...productionPlugins],
+	plugins: [postcssImportExtGlob, postcssImport, postcssPresetEnv({
+		"browsers": [
+			"> 0.2% and not dead"
+		],
+		"preserve": true
+	}), ...productionPlugins],
 	map: !isProd
 };
 
