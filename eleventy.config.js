@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import debug from "./_11ty/debug.js";
+import filters from "./_11ty/filters.js";
 import plugins from "./_11ty/plugins.js";
 
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
@@ -9,6 +10,9 @@ export default async function(eleventyConfig) {
 	eleventyConfig.addFilter("inspect", debug.inspect);
 	eleventyConfig.addFilter("json", debug.json);
 	eleventyConfig.addFilter("keys", debug.keys);
+
+	eleventyConfig.addFilter("markdown", filters.markdownFilter);
+	eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
 
 	eleventyConfig.addPassthroughCopy({"./src/static": "/"});
 
