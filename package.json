@@ -1,0 +1,26 @@
+{
+  "name": "baseline",
+  "version": "1.0.0",
+  "description": "Eleventy boilerplate",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm-run-all clean dev",
+    "clean": "rimraf dist/",
+    "dev": "npx @11ty/eleventy --serve",
+    "build:eleventy": "cross-env ELEVENTY_ENV=production npx @11ty/eleventy",
+    "build": "npm-run-all clean build:*",
+    "dryrun": "npx @11ty/eleventy --dryrun"
+  },
+  "author": "Cristovao Verstraeten",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.1-alpha.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^6.0.1"
+  }
+}
