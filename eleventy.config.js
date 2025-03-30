@@ -16,6 +16,11 @@ export default async function(eleventyConfig) {
 		baseHref: process.env.URL || "http://localhost:8080/"
 	});
 
+	eleventyConfig.addPlugin(plugins.assetsPostCSS);
+	eleventyConfig.addPlugin(plugins.assetsESBuild);
+
+	eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
+
 	return {
 		dir: {
 			input: "src",
