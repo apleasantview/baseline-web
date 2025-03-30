@@ -3,6 +3,7 @@ import "dotenv/config";
 import debug from "./_11ty/debug.js";
 import filters from "./_11ty/filters.js";
 import plugins from "./_11ty/plugins.js";
+import shortcodes from "./_11ty/shortcodes.js";
 
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 export default async function(eleventyConfig) {
@@ -22,6 +23,8 @@ export default async function(eleventyConfig) {
 
 	eleventyConfig.addPlugin(plugins.assetsPostCSS);
 	eleventyConfig.addPlugin(plugins.assetsESBuild);
+
+	eleventyConfig.addShortcode("image", shortcodes.imageShortcode);
 
 	eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
 
