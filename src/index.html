@@ -14,10 +14,18 @@
 </head>
 
 <body>
-	<h1>{{ site.title }}</h1>
-	<p>{{ site.tagline }}</p>
-	<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
+	<a href="#main" class="skip-link">
+		Skip to main content
+	</a>
+	<header>
+		<h1>{{ site.title }}</h1>
+	</header>
+	<main id="main" tabindex="-1">
+		<p>{{ site.tagline }}</p>
+		<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
+	</body>
+	<footer>
 	<small>Build: {{ helpers.buildCommit() }}</small>
-</body>
+</footer>
 
 </html>
