@@ -7,8 +7,9 @@ export default function assetsESBuild(eleventyConfig) {
 
 	eleventyConfig.addExtension("js", {
 		outputFileExtension: "js",
+		useLayouts: false,
 		compile: async function (_inputContent, inputPath) {
-			if (!inputPath.startsWith("./src/assets/js/")) {
+			if (inputPath.includes('11tydata.js') || !inputPath.startsWith("./src/assets/js/") || path.basename(inputPath) !== "index.js") {
 				return;
 			}
 
@@ -24,5 +25,17 @@ export default function assetsESBuild(eleventyConfig) {
 				return result.outputFiles[0].text;
 			}
 		}
+	});
+
+	// Override the default collection behavior. Adding js as template format and extension collects 11tydata.js files.
+	eleventyConfig.addCollection("all", function (collectionApi) {
+		return collectionApi.getAll().filter(item => {
+			// Skip 11tydata.js files
+			if (item.inputPath.endsWith('11tydata.js')) {
+				return false;
+			}
+
+			return true;
+		});
 	});
 };
