@@ -15,9 +15,9 @@ const config = {
 		"browsers": [
 			"> 0.2% and not dead"
 		],
-		"preserve": true
+		"preserve": true,
 	}), ...productionPlugins],
 	map: !isProd
 };
 
-export default config;
+export default config
