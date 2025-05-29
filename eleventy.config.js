@@ -1,3 +1,4 @@
+/* Site config */
 import "dotenv/config";
 
 import debug from "./_11ty/debug.js";
@@ -15,12 +16,13 @@ export default async function (eleventyConfig) {
 	// Filters.
 	eleventyConfig.addFilter("markdown", filters.markdownFilter);
 	eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
+	eleventyConfig.addFilter("inlinePostCSS", filters.inlinePostCSS);
 
 	// Passthrough copy.
 	eleventyConfig.addPassthroughCopy({ "./src/static": "/" });
 
 	// Plugins.
-	eleventyConfig.addPlugin(plugins.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "http://localhost:8080/" });
+	eleventyConfig.addPlugin(plugins.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
 	eleventyConfig.addPlugin(plugins.assetsPostCSS);
 	eleventyConfig.addPlugin(plugins.assetsESBuild);
 
