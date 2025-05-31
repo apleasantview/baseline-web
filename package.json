@@ -6,12 +6,15 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm-run-all clean dev",
+    "start": "npm-run-all clean baseline",
     "clean": "rimraf dist/",
     "dev": "npx @11ty/eleventy --serve",
     "build:eleventy": "cross-env ELEVENTY_ENV=production npx @11ty/eleventy",
     "build": "npm-run-all clean build:*",
-    "dryrun": "npx @11ty/eleventy --dryrun"
+    "dryrun": "npx @11ty/eleventy --dryrun",
+    "lint": "eslint . --ext=js,jsx,ts,tsx",
+    "lint:fix": "eslint . --ext=js,jsx,ts,tsx --fix",
+    "baseline": "npx @11ty/eleventy --config _baseline/eleventy.config.js --serve"
   },
   "author": "Cristovao Verstraeten",
   "license": "ISC",
