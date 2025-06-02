@@ -1,10 +1,10 @@
 /* Site config */
 import "dotenv/config";
 
-import debug from "./_11ty/debug.js";
-import filters from "./_11ty/filters.js";
-import plugins from "./_11ty/plugins.js";
-import shortcodes from "./_11ty/shortcodes.js";
+import debug from "./_baseline/debug.js";
+import filters from "./_baseline/filters.js";
+import modules from "./_baseline/modules.js";
+import shortcodes from "./_baseline/shortcodes.js";
 
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 export default async function (eleventyConfig) {
@@ -22,9 +22,9 @@ export default async function (eleventyConfig) {
 	eleventyConfig.addPassthroughCopy({ "./src/static": "/" });
 
 	// Plugins.
-	eleventyConfig.addPlugin(plugins.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
-	eleventyConfig.addPlugin(plugins.assetsPostCSS);
-	eleventyConfig.addPlugin(plugins.assetsESBuild);
+	eleventyConfig.addPlugin(modules.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
+	eleventyConfig.addPlugin(modules.assetsPostCSS);
+	eleventyConfig.addPlugin(modules.assetsESBuild);
 
 	// Shortcodes.
 	eleventyConfig.addShortcode("image", shortcodes.imageShortcode);
