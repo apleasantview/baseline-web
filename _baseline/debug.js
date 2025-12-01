@@ -13,4 +13,8 @@ function keys(obj) {
   return Object.keys(obj).sort();
 }
 
-export default { inspect, json, keys };
+function context() {
+  return `<pre>${inspect(this.ctx, { depth: 0, colors: false })}</pre>`;
+}
+
+export default { inspect, json, keys, context };

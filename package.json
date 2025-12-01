@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm-run-all clean baseline",
+    "start": "npm-run-all clean dev",
     "clean": "rimraf dist/",
     "dev": "npx @11ty/eleventy --serve",
     "build:eleventy": "cross-env ELEVENTY_ENV=production npx @11ty/eleventy",

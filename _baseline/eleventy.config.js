@@ -6,41 +6,57 @@ import filters from "./filters.js";
 import modules from "./modules.js";
 import shortcodes from "./shortcodes.js";
 
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
-export default async function (eleventyConfig) {
-	// Debug filters.
-	eleventyConfig.addFilter("inspect", debug.inspect);
-	eleventyConfig.addFilter("json", debug.json);
-	eleventyConfig.addFilter("keys", debug.keys);
+/**
+ * Eleventy Baseline Plugin (factory-style)
+ * @param {object} options - Custom options for the plugin.
+ * @returns {(eleventyConfig: UserConfig) => void}
+ */
+export default function baseline(options = {}) {
+	/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
+	return async function(eleventyConfig) {
+		const config = { ...options };
 
-	// Filters.
-	eleventyConfig.addFilter("markdown", filters.markdownFilter);
-	eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
-	eleventyConfig.addFilter("inlinePostCSS", filters.inlinePostCSS);
+		eleventyConfig.addGlobalData("_baseline", config);
+		eleventyConfig.addGlobalData("_0a", {
+			test: eleventyConfig.setV
+		});
 
-	// Passthrough copy.
-	eleventyConfig.addPassthroughCopy({ "./src/static": "/" });
+		// Debug filters and shortcodes.
+		eleventyConfig.addFilter("inspect", debug.inspect);
+		eleventyConfig.addFilter("json", debug.json);
+		eleventyConfig.addFilter("keys", debug.keys);
+		eleventyConfig.addShortcode("ctx", debug.context);
 
-	// Modules.
-	eleventyConfig.addPlugin(modules.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
-	eleventyConfig.addPlugin(modules.assetsPostCSS);
-	eleventyConfig.addPlugin(modules.assetsESBuild);
+		// Filters.
+		eleventyConfig.addFilter("markdown", filters.markdownFilter);
+		eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
+		eleventyConfig.addFilter("inlinePostCSS", filters.inlinePostCSS);
 
-	// Shortcodes.
-	eleventyConfig.addShortcode("image", shortcodes.imageShortcode);
+		// Passthrough copy.
+		eleventyConfig.addPassthroughCopy({ "./src/static": "/" });
 
-	// Watch target.
-	eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
+		// Modules.
+		eleventyConfig.addPlugin(modules.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
+		eleventyConfig.addPlugin(modules.assetsPostCSS);
+		eleventyConfig.addPlugin(modules.assetsESBuild);
+		eleventyConfig.addPlugin(modules.contextNavigator);
 
-	return {
-		dir: {
-			input: "src",
-			output: "dist",
-			data: "_data",
-			includes: "_includes"
-		},
-		htmlTemplateEngine: "njk",
-		markdownTemplateEngine: "njk",
-		templateFormats: ["html", "njk", "md"]
-	}
+		// Shortcodes.
+		eleventyConfig.addShortcode("image", shortcodes.imageShortcode);
+
+		// Watch target.
+		eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
+	};
+}
+
+export const config = {
+	dir: {
+		input: "src",
+		output: "dist",
+		data: "_data",
+		includes: "_includes"
+	},
+	htmlTemplateEngine: "njk",
+	markdownTemplateEngine: "njk",
+	templateFormats: ["html", "njk", "md"]
 };
