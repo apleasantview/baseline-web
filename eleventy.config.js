@@ -8,7 +8,7 @@ import { config as _config } from "./_baseline/eleventy.config.js";
 export default async function (eleventyConfig) {
 	// Import baseline
 	eleventyConfig.addPlugin(baseline({
-		bob: "number one guy"
+		bob: "number one"
 	}));
 
 	eleventyConfig.addFilter("isString", function(object) { 

@@ -39,7 +39,7 @@ export default function baseline(options = {}) {
 		eleventyConfig.addPlugin(modules.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
 		eleventyConfig.addPlugin(modules.assetsPostCSS);
 		eleventyConfig.addPlugin(modules.assetsESBuild);
-		eleventyConfig.addPlugin(modules.contextNavigator);
+		eleventyConfig.addPlugin(modules.coreNavigator);
 
 		// Shortcodes.
 		eleventyConfig.addShortcode("image", shortcodes.imageShortcode);
