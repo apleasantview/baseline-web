@@ -1,7 +1,7 @@
 {
-  "name": "baseline",
+  "name": "eleventy-baseline",
   "version": "1.0.0",
-  "description": "Eleventy boilerplate",
+  "description": "Eleventy baseline project",
   "main": "index.js",
   "type": "module",
   "scripts": {
