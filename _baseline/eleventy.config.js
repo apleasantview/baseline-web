@@ -17,9 +17,6 @@ export default function baseline(options = {}) {
 		const config = { ...options };
 
 		eleventyConfig.addGlobalData("_baseline", config);
-		eleventyConfig.addGlobalData("_0a", {
-			test: eleventyConfig.setV
-		});
 
 		// Debug filters and shortcodes.
 		eleventyConfig.addFilter("inspect", debug.inspect);
@@ -31,6 +28,8 @@ export default function baseline(options = {}) {
 		eleventyConfig.addFilter("markdown", filters.markdownFilter);
 		eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
 		eleventyConfig.addFilter("inlinePostCSS", filters.inlinePostCSS);
+		eleventyConfig.addFilter("inlineESbuild", filters.inlineESbuild);
+		eleventyConfig.addFilter("isString", filters.isStringFilter);
 
 		// Passthrough copy.
 		eleventyConfig.addPassthroughCopy({ "./src/static": "/" });
