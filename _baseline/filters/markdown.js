@@ -5,5 +5,5 @@ const md = markdownit({
 });
 
 export const markdownFilter = (string) => {
-  return md.render(string);
+  return md.renderInline(string);
 };
