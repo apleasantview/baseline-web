@@ -22,7 +22,6 @@ export default function baseline(options = {}) {
 		eleventyConfig.addFilter("inspect", debug.inspect);
 		eleventyConfig.addFilter("json", debug.json);
 		eleventyConfig.addFilter("keys", debug.keys);
-		eleventyConfig.addShortcode("ctx", debug.context);
 
 		// Filters.
 		eleventyConfig.addFilter("markdownify", filters.markdownFilter);
