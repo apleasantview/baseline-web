@@ -1,6 +1,7 @@
 ---
 title: Nederlands
 meta: very important page
+permalink: /nl/
 ---
 
 <!DOCTYPE html>
@@ -31,20 +32,28 @@ meta: very important page
 		<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
 		<p><strong>Collections.all</strong></p>
 		{% for item in collections.all %}
-			<p>{{ item.data | keys }}</p>
+		<p><a href="{{ item.page.url }}">{{ item.page.url }}</a></p>
 		{% endfor %}
 		<p><strong>Baseline data</strong></p>
-		<p><u>Context (ctx) shortcode</u></p>
-		{% ctx %}
-		<p><u>Baseline navigator</u></p>
-		{% for key, value in navigator() %}
-			<p><strong>{{ key }}</strong></p>
-			{% if value | isString %}
-				<pre>{{ value }}</pre>
-			{% else %}
-				<pre>{{ value | inspect }}</pre>
-			{% endif %}
+		<p><u>Context navigator</u></p>
+		{% for key, value in _context() %}
+		<p><strong>{{ key }}</strong></p>
+		{% if value | isString %}
+		<pre>{{ value | string }}</pre>
+		{% else %}
+		<pre>{{ value | inspect }}</pre>
+		{% endif %}
 		{% endfor %}
+		<p><u>Core navigator</u></p>
+		{% for key, value in _navigator() %}
+		<p><strong>{{ key }}</strong></p>
+		{% if value | isString %}
+		<pre>{{ value | string }}</pre>
+		{% else %}
+		<pre>{{ value | inspect }}</pre>
+		{% endif %}
+		{% endfor %}
+	</main>
 	</body>
 	<footer>
 	<small>Build: {{ helpers.buildCommit() }}</small>
