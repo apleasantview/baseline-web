@@ -25,7 +25,7 @@ export default function baseline(options = {}) {
 		eleventyConfig.addShortcode("ctx", debug.context);
 
 		// Filters.
-		eleventyConfig.addFilter("markdown", filters.markdownFilter);
+		eleventyConfig.addFilter("markdownify", filters.markdownFilter);
 		eleventyConfig.addFilter("relatedPosts", filters.relatedPostsFilter);
 		eleventyConfig.addFilter("inlinePostCSS", filters.inlinePostCSS);
 		eleventyConfig.addFilter("inlineESbuild", filters.inlineESbuild);
