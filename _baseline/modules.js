@@ -1,5 +1,6 @@
-// Eleventy
+// Eleventy plugins
 import { EleventyHtmlBasePlugin } from "@11ty/eleventy";
+import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 
 // Custom plugins
 import assetsPostCSS from "./modules/assets-postcss/plugins/assets-postcss.js";
@@ -9,6 +10,7 @@ import navigatorContext from "./modules/navigator-context/plugins/navigator-cont
 
 export default {
 	EleventyHtmlBasePlugin,
+	syntaxHighlight,
 	assetsPostCSS,
 	assetsESBuild,
 	navigatorCore,
