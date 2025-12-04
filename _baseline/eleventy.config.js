@@ -36,6 +36,7 @@ export default function baseline(options = {}) {
 		// Modules.
 		eleventyConfig.addPlugin(modules.EleventyHtmlBasePlugin, { baseHref: process.env.URL || "/" });
 		eleventyConfig.addPlugin(modules.syntaxHighlight);
+		eleventyConfig.addPlugin(modules.assetsCore, { verbose: true });
 		eleventyConfig.addPlugin(modules.assetsPostCSS);
 		eleventyConfig.addPlugin(modules.assetsESBuild);
 		eleventyConfig.addPlugin(modules.navigatorCore);
@@ -54,7 +55,8 @@ export const config = {
 		input: "src",
 		output: "dist",
 		data: "_data",
-		includes: "_includes"
+		includes: "_includes",
+		assets: "assets"
 	},
 	htmlTemplateEngine: "njk",
 	markdownTemplateEngine: "njk",
