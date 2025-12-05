@@ -32,8 +32,12 @@ permalink: /
 		<p>{{ page.outputPath }}</p>
 		<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
 		<p><strong>Collections.all</strong></p>
-		{% for item in collections.all %}
-		<p><a href="{{ item.page.url }}">{{ item.page.url }}</a></p>
+		{% for item in collections.all.slice(0, 1) %}
+		<pre>{{ item.page | inspect }}</pre>
+		{% endfor %}
+		<p><strong>Assets</strong></p>
+		{% for item in collections.assets.slice(0, 1) %}
+		<pre>{{ item | inspect }}</pre>
 		{% endfor %}
 		<p><strong>Baseline data</strong></p>
 		<p><u>Context navigator</u></p>

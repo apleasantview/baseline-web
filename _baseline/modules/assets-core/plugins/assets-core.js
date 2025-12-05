@@ -1,18 +1,14 @@
-import path from "node:path";
 import { TemplatePath } from "@11ty/eleventy-utils";
 import fg from "fast-glob";
-
-/**
- * Helper function to add trailing slash to a path
- * @param {string} path
- * @returns {string}
- */
-function addTrailingSlash(path) {
-  if (path.slice(-1) === "/") {
-    return path;
-  }
-  return path + "/";
-}
+import util from "node:util";
+import {
+	addTrailingSlash,
+	resolveAssetsDir,
+	buildGlobPatterns,
+	createCollectionItem,
+	logIfVerbose,
+	warnIfVerbose,
+} from "../../../helpers.js";
 
 /**
  * eleventy-plugin-assets-core
@@ -33,202 +29,156 @@ function addTrailingSlash(path) {
  */
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 export default function assetsCore(eleventyConfig, options = {}) {
-  const userKey = options.dirKey || "assets";
-  const patterns = options.patterns || ["**/*"];
-  const passthrough = !!options.passthrough;
-  const verbose = !!options.verbose;
+	const userKey = options.dirKey || "assets";
+	const patterns = options.patterns || ["**/*"];
+	const passthrough = !!options.passthrough;
+	const verbose = !!options.verbose;
 
-  // Normalize passthroughOutput → "/assets/"
-  let passthroughOutput = options.passthroughOutput || "assets";
-  passthroughOutput =
-    "/" +
-    passthroughOutput.replace(/^\/+/, "").replace(/\/+$/, "") +
-    "/";
+	// Normalize passthroughOutput → "/assets/"
+	let passthroughOutput = options.passthroughOutput || "assets";
+	passthroughOutput =
+		"/" +
+		passthroughOutput.replace(/^\/+/, "").replace(/\/+$/, "") +
+		"/";
 
-  // Cached paths filled during `eleventy.directories`
-  let cachedInputDir = null;
-  let cachedAssetsDir = null;
-  let cachedAssetsDirRelative = null;
+	// Extract raw directory value from config (can be done early)
+	const rawDir = eleventyConfig.dir?.[userKey] || userKey;
 
-  // -------------------------------------------------------------
-  // 1. Resolve directories on build start
-  // -------------------------------------------------------------
-  eleventyConfig.on("eleventy.directories", (directories) => {
-    const inputDir = directories.input || "./";
+	console.log(eleventyConfig.dir)
 
-    const rawDir = eleventyConfig.dir?.[userKey] || userKey;
-    const rawDirNormalized = TemplatePath.standardizeFilePath(rawDir);
+	// Cached paths filled during `eleventy.directories`
+	let cachedInputDir = null;
+	let cachedOutputDir = null;
+	let cachedAssetsDir = null;
+	let cachedAssetsDirRelative = null;
 
-    const assetsDir = addTrailingSlash(
-      TemplatePath.join(inputDir, rawDirNormalized)
-    );
+	// Make available via global data
+	eleventyConfig.addGlobalData("assetsDir", () => cachedAssetsDir);
+	eleventyConfig.addGlobalData("assetsDirRelative", () => cachedAssetsDirRelative);
 
-    // Cache for use in collections & passthrough
-    cachedInputDir = inputDir;
-    cachedAssetsDir = assetsDir;
-    cachedAssetsDirRelative = rawDirNormalized;
+	// -------------------------------------------------------------
+	// 1. Resolve directories on build start
+	// -------------------------------------------------------------
+	eleventyConfig.on("eleventy.directories", (directories) => {
+		const inputDir = directories.input || "./";
+		const outputDir = directories.output || "./";
 
-    // Add a virtual directory key
-    Object.defineProperty(directories, userKey, {
-      get() {
-        return assetsDir;
-      },
-      enumerable: true,
-      configurable: false,
-    });
+		const { assetsDir, assetsDirRelative } = resolveAssetsDir(inputDir, rawDir);
 
-    // Make available via global data
-    eleventyConfig.addGlobalData("assetsDir", assetsDir);
-    eleventyConfig.addGlobalData("assetsDirRelative", cachedAssetsDirRelative);
+		// Cache for use in collections & passthrough
+		cachedInputDir = inputDir;
+		cachedOutputDir = outputDir;
+		cachedAssetsDir = assetsDir;
+		cachedAssetsDirRelative = assetsDirRelative;
 
-    // URL helper (filter + shortcode)
-    const makeAssetUrl = (fileRel) => {
-      if (!fileRel) return passthroughOutput;
+		// Add a virtual directory key
+		Object.defineProperty(directories, userKey, {
+			get() {
+				return assetsDir;
+			},
+			enumerable: true,
+			configurable: false,
+		});
 
-      const rel = fileRel.replace(/^\/+/, "");
-      return TemplatePath.join(passthroughOutput, rel).replace(/\/$/, "");
-    };
+		console.log(util.inspect(directories, { showHidden: true, getters: true }));
 
-    eleventyConfig.addFilter("assetUrl", makeAssetUrl);
-    eleventyConfig.addShortcode("assetUrl", makeAssetUrl);
+		// URL helper (filter + shortcode)
+		const makeAssetUrl = (fileRel) => {
+			if (!fileRel) return passthroughOutput;
 
-    // Watch assets dir
-    eleventyConfig.addWatchTarget(
-      TemplatePath.join(assetsDir, "**/*")
-    );
+			const rel = fileRel.replace(/^\/+/, "");
+			return TemplatePath.join(passthroughOutput, rel).replace(/\/$/, "");
+		};
 
-    if (verbose) {
-      console.log("[eleventy-plugin-assets-core] assetsDir =", assetsDir);
-      console.log("[eleventy-plugin-assets-core] passthroughOutput =", passthroughOutput);
-    }
-  });
+		eleventyConfig.addFilter("assetUrl", makeAssetUrl);
+		eleventyConfig.addShortcode("assetUrl", makeAssetUrl);
 
-  // -------------------------------------------------------------
-  // 2. Collection: enumerate asset files
-  // -------------------------------------------------------------
-  eleventyConfig.addCollection("assets", async () => {
-    // Fallback: If directories event hasn't fired
-    if (!cachedAssetsDir) {
-      const inputDir = eleventyConfig.dir?.input || ".";
-      const rawDir = eleventyConfig.dir?.[userKey] || userKey;
-      const rawDirNormalized = TemplatePath.standardizeFilePath(rawDir);
+		// Watch assets dir using the same patterns as the collection
+		patterns
+			.map((pattern) => TemplatePath.join(assetsDir, pattern))
+			.forEach((watchPattern) => eleventyConfig.addWatchTarget(watchPattern));
 
-      cachedInputDir = inputDir;
-      cachedAssetsDir = addTrailingSlash(
-        TemplatePath.join(inputDir, rawDirNormalized)
-      );
-      cachedAssetsDirRelative = rawDirNormalized;
+		logIfVerbose(verbose, "assetsDir =", assetsDir);
+		logIfVerbose(verbose, "passthroughOutput =", passthroughOutput);
+	});
 
-      if (verbose) {
-        console.warn("[eleventy-plugin-assets-core] Fallback directory resolution");
-      }
-    }
+	// -------------------------------------------------------------
+	// 2. Collection: enumerate asset files
+	// -------------------------------------------------------------
+	eleventyConfig.addCollection("assets", async () => {
+		// Fallback: If directories event hasn't fired
+		if (!cachedAssetsDir) {
+			const inputDir = eleventyConfig.dir?.input || ".";
+			const outputDir = eleventyConfig.dir?.output || ".";
 
-    // Normalize absolute dirs for consistency across platforms
-    const assetsDirAbsolute = TemplatePath.standardizeFilePath(
-      TemplatePath.absolutePath(
-        TemplatePath.stripLeadingDotSlash(cachedAssetsDir)
-      )
-    );
+			const { assetsDir, assetsDirRelative } = resolveAssetsDir(inputDir, rawDir);
 
-    const inputDirAbsolute = TemplatePath.standardizeFilePath(
-      TemplatePath.absolutePath(
-        TemplatePath.stripLeadingDotSlash(cachedInputDir)
-      )
-    );
+			cachedInputDir = inputDir;
+			cachedOutputDir = outputDir;
+			cachedAssetsDir = assetsDir;
+			cachedAssetsDirRelative = assetsDirRelative;
 
-    // Build globs (absolute) for fast-glob
-    const globs = patterns.map((pattern) => {
-      const normalized = TemplatePath.standardizeFilePath(pattern);
-      return normalized.startsWith("/") || path.isAbsolute(normalized)
-        ? normalized
-        : TemplatePath.join(assetsDirAbsolute, normalized);
-    });
+			warnIfVerbose(verbose, "Fallback directory resolution");
+		}
 
-    if (verbose) {
-      console.log("[eleventy-plugin-assets-core] scanning globs:", globs);
-    }
+		// Build globs (absolute) for fast-glob
+		const globs = buildGlobPatterns(patterns, cachedAssetsDir);
 
-    // Glob for matching files with error handling
-    let entries;
-    try {
-      entries = await fg(globs, {
-        dot: true,
-        onlyFiles: true,
-        absolute: true,
-        cwd: TemplatePath.getWorkingDir(),
-      });
-    } catch (error) {
-      if (verbose) {
-        console.error("[eleventy-plugin-assets-core] Error scanning assets:", error);
-      }
-      return [];
-    }
+		logIfVerbose(verbose, "scanning globs:", globs);
 
-    // Pre-normalize for re-use
-    const passthroughBase = TemplatePath.standardizeFilePath(assetsDirAbsolute);
+		// Glob for matching files with error handling
+		let entries;
+		try {
+			entries = await fg(globs, {
+				dot: true,
+				onlyFiles: true,
+				absolute: true,
+				cwd: TemplatePath.getWorkingDir(),
+			});
+		} catch (error) {
+			logIfVerbose(verbose, "Error scanning assets:", error);
+			return [];
+		}
 
-    return entries.map((filePath) => {
-      const normalizedPath = TemplatePath.standardizeFilePath(filePath);
-      const ext = TemplatePath.getExtension(normalizedPath);
-      const fileExt = ext ? ext.slice(1) : "";
+		// Convert absolute paths to relative (Eleventy format) immediately
+		return entries.map((absolutePath) => {
+			// Convert to relative path from project root with ./
+			const inputPath = TemplatePath.addLeadingDotSlash(
+				TemplatePath.relativePath(absolutePath)
+			);
 
-      // Unique slug (basename without extension)
-      const basename = TemplatePath.getLastPathSegment(normalizedPath, false);
-      const fileSlug = ext ? basename.slice(0, -ext.length) : basename;
+			return createCollectionItem(
+				inputPath,
+				cachedInputDir,
+				cachedOutputDir,
+				cachedAssetsDirRelative,
+				passthroughOutput,
+				passthrough
+			);
+		});
+	});
 
-      const relToInput = TemplatePath.stripLeadingSubPath(
-        normalizedPath,
-        inputDirAbsolute
-      );
+	// -------------------------------------------------------------
+	// 3. Optional passthrough copy
+	// -------------------------------------------------------------
+	if (passthrough) {
+		eleventyConfig.on("eleventy.before", ({ directories }) => {
+			const src = directories[userKey] || cachedAssetsDir;
 
-      const relToAssets = TemplatePath.stripLeadingSubPath(
-        normalizedPath,
-        passthroughBase
-      );
+			// Safety check: ensure we have a valid source directory
+			if (!src) {
+				warnIfVerbose(verbose, "No assets directory found for passthrough");
+				return;
+			}
 
-      const url = passthrough
-        ? TemplatePath.join(passthroughOutput, relToAssets).replace(/\/$/, "")
-        : undefined;
+			// Add trailing slash → directory passthrough (faster + safer)
+			const srcDir = addTrailingSlash(src);
 
-      return {
-        inputPath: normalizedPath,
-        outputPath: relToInput,
-        basename,
-        fileSlug,
-        fileExt,
-        dir: TemplatePath.getDirFromFilePath(normalizedPath),
-        url,
-      };
-    });
-  });
+			eleventyConfig.addPassthroughCopy({
+				[srcDir]: passthroughOutput,
+			});
 
-  // -------------------------------------------------------------
-  // 3. Optional passthrough copy
-  // -------------------------------------------------------------
-  if (passthrough) {
-    eleventyConfig.on("eleventy.before", ({ directories }) => {
-      const src = directories[userKey] || cachedAssetsDir;
-
-      // Safety check: ensure we have a valid source directory
-      if (!src) {
-        if (verbose) {
-          console.warn("[eleventy-plugin-assets-core] No assets directory found for passthrough");
-        }
-        return;
-      }
-
-      // Add trailing slash → directory passthrough (faster + safer)
-      const srcDir = addTrailingSlash(src);
-
-      eleventyConfig.addPassthroughCopy({
-        [srcDir]: passthroughOutput,
-      });
-
-      if (verbose) {
-        console.log("[eleventy-plugin-assets-core] passthrough:", srcDir, "→", passthroughOutput);
-      }
-    });
-  }
+			logIfVerbose(verbose, "passthrough:", srcDir, "→", passthroughOutput);
+		});
+	}
 }
-
