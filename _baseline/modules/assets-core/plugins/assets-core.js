@@ -8,6 +8,7 @@ import {
 	createCollectionItem,
 	logIfVerbose,
 	warnIfVerbose,
+	getVerbose,
 } from "../../../helpers.js";
 
 /**
@@ -25,14 +26,15 @@ import {
  *  patterns: string[]     - glob patterns relative to assets dir (default: all files)
  *  passthrough: boolean   - enable passthrough copy (default: false)
  *  passthroughOutput: string - where to copy in output (default: "assets")
- *  verbose: boolean       - console logging
+ *  verbose: boolean       - console logging (defaults to global baseline verbose setting)
  */
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 export default function assetsCore(eleventyConfig, options = {}) {
 	const userKey = options.dirKey || "assets";
 	const patterns = options.patterns || ["**/*"];
 	const passthrough = !!options.passthrough;
-	const verbose = !!options.verbose;
+	const globalVerbose = getVerbose(eleventyConfig);
+	const verbose = globalVerbose || options.verbose || false;
 
 	// Normalize passthroughOutput → "/assets/"
 	let passthroughOutput = options.passthroughOutput || "assets";
@@ -43,8 +45,6 @@ export default function assetsCore(eleventyConfig, options = {}) {
 
 	// Extract raw directory value from config (can be done early)
 	const rawDir = eleventyConfig.dir?.[userKey] || userKey;
-
-	console.log(eleventyConfig.dir)
 
 	// Cached paths filled during `eleventy.directories`
 	let cachedInputDir = null;
@@ -80,7 +80,7 @@ export default function assetsCore(eleventyConfig, options = {}) {
 			configurable: false,
 		});
 
-		console.log(util.inspect(directories, { showHidden: true, getters: true }));
+		logIfVerbose(verbose, "directories", util.inspect(directories, { showHidden: true, getters: true }))
 
 		// URL helper (filter + shortcode)
 		const makeAssetUrl = (filePathRelative) => {

@@ -8,6 +8,7 @@ import { config as _config } from "./_baseline/eleventy.config.js";
 export default async function (eleventyConfig) {
 	// Import baseline
 	eleventyConfig.addPlugin(baseline({
+		verbose: true,
 		Bob: "My number one guy."
 	}));
 };

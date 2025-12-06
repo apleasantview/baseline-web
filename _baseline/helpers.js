@@ -149,7 +149,7 @@ export function createCollectionItem(
  */
 export function logIfVerbose(verbose, message, ...args) {
 	if (verbose) {
-		console.log(`[eleventy-baseline] ${message}`, ...args);
+		console.log(`[eleventy-baseline] INFO ${message}`, ...args);
 	}
 }
 
@@ -160,8 +160,17 @@ export function logIfVerbose(verbose, message, ...args) {
  */
 export function warnIfVerbose(verbose, message) {
 	if (verbose) {
-		console.warn(`[eleventy-baseline] ${message}`);
+		console.warn(`[eleventy-baseline] WARN ${message}`);
 	}
 }
+
+/**
+ * Gets verbose flag from Eleventy global data
+ * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
+ * @returns {boolean}
+ */
+export function getVerbose(eleventyConfig) {
+	const baselineData = eleventyConfig.globalData?._baseline;
+	return !!baselineData?.verbose;
 }
 
