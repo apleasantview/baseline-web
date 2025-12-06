@@ -31,32 +31,16 @@ permalink: /
 		<p>{{ site.tagline }}</p>
 		<p>{{ page.outputPath }}</p>
 		<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
-		<p><strong>Collections.all</strong></p>
-		{% for item in collections.all.slice(0, 1) %}
-		<pre>{{ item.page | inspect }}</pre>
-		{% endfor %}
-		<p><strong>Assets</strong></p>
-		{% for item in collections.assets.slice(0, 1) %}
-		<pre>{{ item | inspect }}</pre>
-		{% endfor %}
-		<p><strong>Baseline data</strong></p>
-		<p><u>Context navigator</u></p>
-		{% for key, value in _context() %}
-		<p><strong>{{ key }}</strong></p>
-		{% if value | isString %}
-		<pre>{{ value | string }}</pre>
-		{% else %}
-		<pre>{{ value | inspect }}</pre>
-		{% endif %}
-		{% endfor %}
 		<p><u>Core navigator</u></p>
 		{% for key, value in _navigator() %}
-		<p><strong>{{ key }}</strong></p>
-		{% if value | isString %}
-		<pre>{{ value | string }}</pre>
-		{% else %}
-		<pre>{{ value | inspect }}</pre>
-		{% endif %}
+			<details open>
+				<summary><strong>{{ key }}</strong></summary>
+				{% if value | isString %}
+				<pre>{{ value }}</pre>
+				{% else %}
+				<pre>{{ value | inspect }}</pre>
+				{% endif %}
+			</details>
 		{% endfor %}
 	</main>
 </body>
