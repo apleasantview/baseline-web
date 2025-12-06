@@ -14,14 +14,19 @@ import shortcodes from "./shortcodes.js";
 export default function baseline(options = {}) {
 	/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 	return async function(eleventyConfig) {
-		const config = { ...options };
+		try {
+			// Emit a warning message if the application is not using Eleventy 3.0 or newer (including prereleases).
+			eleventyConfig.versionCheck(">=3.0");
+		} catch(e) {
+			console.log( `[eleventy-baseline] WARN Eleventy plugin compatibility: ${e.message}` );
+		}
 
-		eleventyConfig.addGlobalData("_baseline", config);
+		const userOptions = { 
+			verbose: options.verbose ?? false,
+			...options 
+		};
 
-		// Debug filters and shortcodes.
-		eleventyConfig.addFilter("inspect", debug.inspect);
-		eleventyConfig.addFilter("json", debug.json);
-		eleventyConfig.addFilter("keys", debug.keys);
+		eleventyConfig.addGlobalData("_baseline", userOptions);
 
 		// Filters.
 		eleventyConfig.addFilter("markdownify", filters.markdownFilter);
@@ -47,6 +52,11 @@ export default function baseline(options = {}) {
 
 		// Watch target.
 		eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
+
+		// Debug filters.
+		eleventyConfig.addFilter("inspect", debug.inspect);
+		eleventyConfig.addFilter("json", debug.json);
+		eleventyConfig.addFilter("keys", debug.keys);
 	};
 }
 
