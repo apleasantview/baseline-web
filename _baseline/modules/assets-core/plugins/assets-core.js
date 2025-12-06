@@ -12,7 +12,7 @@ import {
 } from "../../../helpers.js";
 
 /**
- * eleventy-plugin-assets-manager
+ * eleventy-plugin-assets-core
  *
  * Features:
  *  - Adds a virtual directory `directories[dirKey]`
@@ -29,7 +29,7 @@ import {
  *  verbose: boolean       - console logging (defaults to global baseline verbose setting)
  */
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
-export default function assetsManager(eleventyConfig, options = {}) {
+export default function assetsCore(eleventyConfig, options = {}) {
 	const userKey = options.dirKey || "assets";
 	const patterns = options.patterns || ["**/*"];
 	const passthrough = !!options.passthrough;
