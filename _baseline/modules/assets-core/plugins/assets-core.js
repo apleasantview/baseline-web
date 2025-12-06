@@ -53,8 +53,8 @@ export default function assetsCore(eleventyConfig, options = {}) {
 	let cachedAssetsDirRelative = null;
 
 	// Make available via global data
-	eleventyConfig.addGlobalData("assetsDir", () => cachedAssetsDir);
-	eleventyConfig.addGlobalData("assetsDirRelative", () => cachedAssetsDirRelative);
+	eleventyConfig.addGlobalData("_baseline.assetsDir", () => cachedAssetsDir);
+	eleventyConfig.addGlobalData("_baseline.assetsDirRelative", () => cachedAssetsDirRelative);
 
 	// -------------------------------------------------------------
 	// 1. Resolve directories on build start
@@ -83,10 +83,10 @@ export default function assetsCore(eleventyConfig, options = {}) {
 		console.log(util.inspect(directories, { showHidden: true, getters: true }));
 
 		// URL helper (filter + shortcode)
-		const makeAssetUrl = (fileRel) => {
-			if (!fileRel) return passthroughOutput;
+		const makeAssetUrl = (filePathRelative) => {
+			if (!filePathRelative) return passthroughOutput;
 
-			const rel = fileRel.replace(/^\/+/, "");
+			const rel = filePathRelative.replace(/^\/+/, "");
 			return TemplatePath.join(passthroughOutput, rel).replace(/\/$/, "");
 		};
 
