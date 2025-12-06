@@ -149,7 +149,7 @@ export function createCollectionItem(
  */
 export function logIfVerbose(verbose, message, ...args) {
 	if (verbose) {
-		console.log(`[eleventy-plugin-assets-core] ${message}`, ...args);
+		console.log(`[eleventy-baseline] ${message}`, ...args);
 	}
 }
 
@@ -160,7 +160,8 @@ export function logIfVerbose(verbose, message, ...args) {
  */
 export function warnIfVerbose(verbose, message) {
 	if (verbose) {
-		console.warn(`[eleventy-plugin-assets-core] ${message}`);
+		console.warn(`[eleventy-baseline] ${message}`);
 	}
+}
 }
 
