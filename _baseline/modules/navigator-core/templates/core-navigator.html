@@ -1,7 +1,7 @@
 ---
-title: Homepage
-meta: very important page
-permalink: /
+title: Core Navigator
+meta: Very important page
+permalink: /core-navigator/
 ---
 
 <!DOCTYPE html>
@@ -30,11 +30,7 @@ permalink: /
 	<main id="main" tabindex="-1">
 		<p>{{ site.tagline }}</p>
 		<p>{{ page.outputPath }}</p>
-		<p><a href="#">{{ site.baseURL | htmlBaseUrl}}</a></p>
-		<p><strong>Collections.all</strong></p>
-		{% for item in collections.all %}
-		<p><a href="{{ item.url }}">{{ item.url }}</a></p>
-		{% endfor %}
+		<p><a href="{{ site.baseURL | htmlBaseUrl}}">{{ site.baseURL | htmlBaseUrl}}</a></p>
 		<p><u>Core navigator</u></p>
 		{% for key, value in _navigator() %}
 			<details open>
@@ -53,3 +49,4 @@ permalink: /
 </footer>
 
 </html>
+
